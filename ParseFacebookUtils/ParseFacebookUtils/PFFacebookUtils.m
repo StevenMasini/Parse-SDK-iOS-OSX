@@ -90,6 +90,29 @@ static PFFacebookAuthenticationProvider *authenticationProvider_;
     [[self logInInBackgroundWithReadPermissions:permissions] pffb_continueWithMainThreadUserBlock:block];
 }
 
+// Take care when updating this. We added this method to check that facebook ids used during re-auth are matching.
+// This issue started when moving the App Store Connect account from HK to SG.
++ (void)logInInBackgroundWithReadPermissions:(NSArray<NSString *> *)permissions facebookId:(nullable NSString *)facebookId block:(PFUserResultBlock)block {
+    if (!facebookId) {
+        // if facebookId is nil, then nothing to check, call the original method and return
+        [PFFacebookUtils logInInBackgroundWithReadPermissions:permissions block:block];
+        return;
+    }
+    
+    [self _assertFacebookInitialized];
+    
+    PFFacebookAuthenticationProvider *provider = [self _authenticationProvider];
+    [[[provider authenticateAsyncWithReadPermissions:permissions publishPermissions:nil] continueWithSuccessBlock:^id(BFTask *task) {
+        NSString *newFacebookId = ((NSDictionary *)task.result)[@"id"];
+        if (![newFacebookId isEqualToString:facebookId]) {
+            [[PFFacebookUtils facebookLoginManager] logOut]; // wrong facebook account, log out user and ask him to try again with the right account.
+            return [BFTask taskWithError: [NSError strongfb_facebookAccountNotMatching]];
+        }
+        return [PFUser logInWithAuthTypeInBackground:PFFacebookUserAuthenticationType authData:task.result];
+    }]
+     pffb_continueWithMainThreadUserBlock:block];
+}
+
 + (BFTask *)logInInBackgroundWithPublishPermissions:(nullable NSArray<NSString *> *)permissions {
     return [self _logInAsyncWithReadPermissions:nil publishPermissions:permissions];
 }

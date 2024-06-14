@@ -46,6 +46,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface NSError (ParseFacebookUtils)
 
 + (instancetype)pffb_invalidFacebookSessionError;
++ (instancetype)strongfb_facebookAccountNotMatching;
 
 @end
 

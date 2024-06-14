@@ -87,6 +87,24 @@ NS_ASSUME_NONNULL_BEGIN
                                        block:(nullable PFUserResultBlock)block;
 
 /**
+ * Custom implementation made by Steven Masini on 22 Sept 2020
+ * This ensure that the current facebook account used by user match the one to re-auth
+ * Asynchronously* logs in a user using Facebook with read permissions.
+ 
+ This method delegates to the Facebook SDK to authenticate the user,
+ and then automatically logs in (or creates, in the case where it is a new user) a `PFUser`.
+ 
+ @param permissions Array of read permissions to use.
+ @param facebookId of the current user, making sure both account match
+ @param block       The block to execute when the log in completes.
+ It should have the following signature: `^(PFUser *user, NSError *error)`.
+ */
++ (void)logInInBackgroundWithReadPermissions:(NSArray<NSString *> *)permissions
+                                  facebookId:(nullable NSString *)facebookId
+                                       block:(PFUserResultBlock)block;
+
+
+/**
  *Asynchronously* logs in a user using Facebook with publish permissions.
 
  This method delegates to the Facebook SDK to authenticate the user,

@@ -37,7 +37,7 @@
     if (!token.userID || !token.tokenString || !token.expirationDate) {
         return nil;
     }
-
+    
     return [self userAuthenticationDataWithFacebookUserId:token.userID
                                               accessToken:token.tokenString
                                            expirationDate:token.expirationDate];
@@ -49,8 +49,8 @@
     if (!accessToken || !expirationDateString) {
         return nil;
     }
-
-NSDate *expirationDate = [[NSDateFormatter pffb_preciseDateFormatter] dateFromString:expirationDateString];
+    
+    NSDate *expirationDate = [[NSDateFormatter pffb_preciseDateFormatter] dateFromString:expirationDateString];
     FBSDKAccessToken *token = [[FBSDKAccessToken alloc] initWithTokenString: accessToken permissions:@[] declinedPermissions:@[] expiredPermissions:@[] appID: [FBSDKSettings appID] userID: authData[@"id"] expirationDate: expirationDate refreshDate: nil dataAccessExpirationDate: nil];
     return token;
 }
@@ -89,6 +89,12 @@ NSDate *expirationDate = [[NSDateFormatter pffb_preciseDateFormatter] dateFromSt
     return [NSError errorWithDomain:PFParseErrorDomain
                                code:kPFErrorFacebookInvalidSession
                            userInfo:@{ NSLocalizedDescriptionKey : @"Supplied access token is missing required data." }];
+}
+
++ (instancetype)strongfb_facebookAccountNotMatching {
+    return [NSError errorWithDomain:@"StrongErrorDomain"
+                               code:251
+                           userInfo: @{ NSLocalizedDescriptionKey : @"Strong had a problem re-authenticating your account. Please make sure that your Facebook account is the same one you used to sign up for Strong.\n\nIf the problem persists, please reach out to us for support." }];
 }
 
 @end
